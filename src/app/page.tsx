@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { initTelegramApp, getTelegramUser, showMainButton, sendDataToBot } from '@/utils/telegram';
+import { initTelegramApp, getTelegramUser } from '@/utils/telegram';
 
 interface TelegramUser {
   id: number;
@@ -19,9 +19,6 @@ export default function Home() {
     if (telegramUser) {
       initTelegramApp();
       setUser(telegramUser);
-      showMainButton('Start Mini App', () => {
-        sendDataToBot({ action: 'start', userId: telegramUser.id });
-      });
     }
   }, []);
 
@@ -49,7 +46,6 @@ export default function Home() {
                 <li 
                   key={index}
                   className="flex items-center p-2 hover:bg-blue-100 rounded-md cursor-pointer transition-colors"
-                  onClick={() => sendDataToBot({ action: 'select_feature', feature })}
                 >
                   <span className="w-8 h-8 flex items-center justify-center bg-blue-200 rounded-full mr-3">
                     {index + 1}
