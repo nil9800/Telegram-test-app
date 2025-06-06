@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { initTelegramApp, getTelegramUser } from '@/utils/telegram';
 import BottomNavigation from '@/components/BottomNavigation';
-import Link from 'next/link';
 
 interface TelegramUser {
   id: number;
@@ -13,194 +13,217 @@ interface TelegramUser {
   language_code?: string;
 }
 
-interface GameState {
-  level: number;
-  energy: number;
-  maxEnergy: number;
-  gold: number;
-  progress: number;
-  nextEnergyRefill: Date;
-}
-
 export default function Home() {
   const [user, setUser] = useState<TelegramUser | null>(null);
-  const [gameState, setGameState] = useState<GameState>({
-    level: 1,
-    energy: 50,
-    maxEnergy: 100,
-    gold: 250,
-    progress: 65,
-    nextEnergyRefill: new Date(Date.now() + 3600000), // 1 hour from now
-  });
-
+  const [energy, setEnergy] = useState(75);
+  const [gold, setGold] = useState(450);
+  const [nextEnergyTime, setNextEnergyTime] = useState(300); // 5 minutes in seconds
+  
   useEffect(() => {
     const telegramUser = getTelegramUser();
     if (telegramUser) {
       initTelegramApp();
       setUser(telegramUser);
     }
-  }, []);
-
-  // Format time remaining until next energy refill
-  const formatTimeRemaining = () => {
-    const now = new Date();
-    const diff = gameState.nextEnergyRefill.getTime() - now.getTime();
-    if (diff <= 0) return "Ready";
     
-    const minutes = Math.floor((diff / 1000 / 60) % 60);
-    const hours = Math.floor((diff / 1000 / 60 / 60) % 24);
-    return `${hours}h ${minutes}m`;
+    // Energy timer
+    const timer = setInterval(() => {
+      setNextEnergyTime((prev) => {
+        if (prev <= 1) {
+          setEnergy(e => Math.min(e + 1, 100));
+          return 300; // Reset to 5 minutes
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' + secs : secs}`;
   };
-
+  
   // If no Telegram user data is available, render nothing
   if (!user) return null;
 
-  // Only render the app if we have Telegram user data
   return (
     <>
       <main className="flex min-h-screen flex-col items-center p-6 bg-gradient-to-b from-[#2AABEE] to-[#229ED9] pb-16">
         <div className="w-full max-w-md">
-          {/* User Stats Bar */}
-          <div className="bg-white rounded-xl shadow-lg p-4 mb-4 flex justify-between items-center">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                <span className="font-bold text-blue-500">
-                  {user.first_name.charAt(0)}
-                </span>
-              </div>
+          {/* Welcome Card */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="font-semibold">{user.first_name}</p>
-                <p className="text-xs text-gray-500">Level {gameState.level}</p>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Welcome, {user.first_name}!
+                </h1>
+                <p className="text-gray-500">Ready to mine some blocks?</p>
               </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              {/* Energy */}
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                </svg>
-                <span className="font-bold text-sm">{gameState.energy}/{gameState.maxEnergy}</span>
-              </div>
-              {/* Gold */}
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
-                </svg>
-                <span className="font-bold text-sm">{gameState.gold}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Level Progress */}
-          <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="font-bold text-gray-800">Level {gameState.level} Progress</h2>
-              <span className="text-sm text-gray-500">{gameState.progress}%</span>
-            </div>
-            <div className="relative h-6 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                style={{ width: `${gameState.progress}%` }}
-              ></div>
-              {/* Gift boxes on progress bar */}
-              <div className="absolute top-0 left-0 h-full w-full flex items-center">
-                <div className="absolute left-[25%] transform -translate-x-1/2">
-                  <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clipRule="evenodd" />
-                    <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
-                  </svg>
-                </div>
-                <div className="absolute left-[50%] transform -translate-x-1/2">
-                  <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clipRule="evenodd" />
-                    <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
-                  </svg>
-                </div>
-                <div className="absolute left-[75%] transform -translate-x-1/2">
-                  <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clipRule="evenodd" />
-                    <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Energy Refill Timer */}
-          <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-bold text-gray-800">Energy Refill</h3>
-                <p className="text-sm text-gray-500">Next refill in: {formatTimeRemaining()}</p>
-              </div>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">
-                Claim
-              </button>
-            </div>
-          </div>
-
-          {/* Game Actions */}
-          <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <h2 className="font-bold text-gray-800 mb-3">Fun Block Mining</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <Link href="/play" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 rounded-lg flex flex-col items-center">
-                <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Play Now</span>
+              <Link href="/profile" className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                {user.first_name ? user.first_name.charAt(0) : 'U'}
               </Link>
-              <button className="bg-gradient-to-r from-green-500 to-teal-500 text-white p-4 rounded-lg flex flex-col items-center">
-                <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </div>
+            
+            {/* Resources */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                    </svg>
+                    <span className="font-medium">Energy</span>
+                  </div>
+                  <span className="text-lg font-bold">{energy}/100</span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full" 
+                    style={{ width: `${energy}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1 text-right">
+                  Next in {formatTime(nextEnergyTime)}
+                </div>
+              </div>
+              
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
+                    </svg>
+                    <span className="font-medium">Gold</span>
+                  </div>
+                  <span className="text-lg font-bold">{gold}</span>
+                </div>
+                <Link href="/wallet" className="w-full text-center block text-xs text-yellow-600 mt-4 bg-yellow-100 py-1 rounded">
+                  View Wallet
+                </Link>
+              </div>
+            </div>
+            
+            {/* Quick Actions */}
+            <Link 
+              href="/play" 
+              className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-medium text-center mb-4"
+            >
+              Start Mining
+            </Link>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <Link 
+                href="/task" 
+                className="bg-green-100 text-green-700 p-4 rounded-lg flex flex-col items-center"
+              >
+                <svg className="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
                 <span>Daily Tasks</span>
-              </button>
-              <button className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-lg flex flex-col items-center">
-                <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Get Energy</span>
-              </button>
-              <Link href="/friends" className="bg-gradient-to-r from-red-500 to-pink-500 text-white p-4 rounded-lg flex flex-col items-center">
-                <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </Link>
+              <Link 
+                href="/friends" 
+                className="bg-purple-100 text-purple-700 p-4 rounded-lg flex flex-col items-center"
+              >
+                <svg className="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 <span>Invite Friends</span>
               </Link>
             </div>
           </div>
-
-          {/* Leaderboard Preview */}
-          <div className="bg-white rounded-xl shadow-lg p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="font-bold text-gray-800">Top Miners</h2>
-              <button className="text-blue-500 text-sm">View All</button>
+          
+          {/* Game Updates */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Game Updates</h2>
+            
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h3 className="font-medium text-gray-800">New Block Patterns</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  We've added 5 new block patterns for you to discover and mine!
+                </p>
+                <div className="flex justify-end">
+                  <span className="text-xs text-gray-500">2 days ago</span>
+                </div>
+              </div>
+              
+              <div className="p-4 bg-green-50 rounded-lg">
+                <h3 className="font-medium text-gray-800">Daily Rewards Increased</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  Complete daily tasks to earn 50% more gold and energy!
+                </p>
+                <div className="flex justify-end">
+                  <span className="text-xs text-gray-500">5 days ago</span>
+                </div>
+              </div>
             </div>
+          </div>
+          
+          {/* Leaderboard Preview */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Top Miners</h2>
+              <button className="text-sm text-blue-500">View All</button>
+            </div>
+            
             <div className="space-y-3">
-              {[
-                { name: "Alex", level: 8, gold: 1250 },
-                { name: "Sarah", level: 7, gold: 980 },
-                { name: "Mike", level: 6, gold: 820 }
-              ].map((player, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <span className="font-bold text-blue-500">{index + 1}</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">{player.name}</p>
-                      <p className="text-xs text-gray-500">Level {player.level}</p>
-                    </div>
+              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-full bg-yellow-200 flex items-center justify-center mr-3 text-yellow-700">
+                    1
                   </div>
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
-                    </svg>
-                    <span className="font-bold text-sm">{player.gold}</span>
+                  <div>
+                    <p className="font-medium">Alex</p>
+                    <p className="text-xs text-gray-500">Level 15</p>
                   </div>
                 </div>
-              ))}
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-bold">1,250</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 text-gray-700">
+                    2
+                  </div>
+                  <div>
+                    <p className="font-medium">Maria</p>
+                    <p className="text-xs text-gray-500">Level 14</p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-bold">1,120</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 text-gray-700">
+                    3
+                  </div>
+                  <div>
+                    <p className="font-medium">John</p>
+                    <p className="text-xs text-gray-500">Level 13</p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-bold">980</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
