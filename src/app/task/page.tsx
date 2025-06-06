@@ -19,6 +19,7 @@ interface Task {
   progress: number;
   total: number;
   completed: boolean;
+  claimed: boolean;
   reward: {
     type: 'energy' | 'gold' | 'special';
     amount: number;
@@ -36,6 +37,7 @@ export default function TaskPage() {
       progress: 1,
       total: 1,
       completed: true,
+      claimed: false,
       reward: { type: 'energy', amount: 20 },
       icon: 'calendar'
     },
@@ -46,6 +48,7 @@ export default function TaskPage() {
       progress: 1,
       total: 3,
       completed: false,
+      claimed: false,
       reward: { type: 'gold', amount: 50 },
       icon: 'puzzle'
     },
@@ -56,6 +59,7 @@ export default function TaskPage() {
       progress: 1,
       total: 2,
       completed: false,
+      claimed: false,
       reward: { type: 'energy', amount: 30 },
       icon: 'lightning'
     },
@@ -66,6 +70,7 @@ export default function TaskPage() {
       progress: 0,
       total: 1,
       completed: false,
+      claimed: false,
       reward: { type: 'special', amount: 1 },
       icon: 'users'
     }
@@ -79,6 +84,7 @@ export default function TaskPage() {
       progress: 0,
       total: 2,
       completed: false,
+      claimed: false,
       reward: { type: 'gold', amount: 200 },
       icon: 'trophy'
     },
@@ -89,6 +95,7 @@ export default function TaskPage() {
       progress: 1,
       total: 5,
       completed: false,
+      claimed: false,
       reward: { type: 'energy', amount: 100 },
       icon: 'calendar'
     }
