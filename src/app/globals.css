@@ -34,31 +34,23 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 10, 10, 30;
-  --background-end-rgb: 30, 20, 60;
-  --accent-color-1: 86, 30, 159;
-  --accent-color-2: 30, 64, 175;
+  --background-start-rgb: 10, 10, 18;
+  --background-end-rgb: 20, 20, 30;
+  --accent-color-1: 59, 130, 246;
+  --accent-color-2: 37, 99, 235;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    135deg,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb)),
-    rgba(var(--accent-color-1), 0.7),
-    rgb(var(--background-end-rgb))
-  );
-  background-size: 300% 300%;
-  animation: gradientShift 15s ease infinite;
+  background: #121212;
   min-height: 100vh;
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(30, 30, 40, 0.7);
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  border: 1px solid rgba(70, 70, 90, 0.2);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
 }
 
 .card {
@@ -66,8 +58,46 @@ body {
 }
 
 .glow {
-  box-shadow: 0 0 10px rgba(var(--accent-color-1), 0.5),
-              0 0 20px rgba(var(--accent-color-2), 0.3);
+  box-shadow: 0 0 8px rgba(var(--accent-color-1), 0.4);
+}
+
+/* Navigation styles */
+.nav-item {
+  @apply flex flex-col items-center py-3 px-2 transition-all duration-300;
+}
+
+.nav-item-active {
+  @apply text-blue-400;
+}
+
+.nav-item-inactive {
+  @apply text-gray-400 hover:text-gray-300;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium text-center transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-lg font-medium text-center transition-colors;
+}
+
+/* Common utility classes */
+.dark-card {
+  @apply bg-gray-800 rounded-xl p-4 border border-gray-700;
+}
+
+.text-primary {
+  @apply text-white;
+}
+
+.text-secondary {
+  @apply text-gray-300;
+}
+
+.text-muted {
+  @apply text-gray-400;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -27,24 +27,6 @@ export default function RootLayout({
         <div className="pb-16 max-w-md mx-auto relative z-10">
           {children}
         </div>
-        
-        {/* Animated background elements */}
-        <div className="fixed inset-0 z-0 overflow-hidden opacity-30 pointer-events-none">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                background: `rgba(${Math.random() > 0.5 ? '86, 30, 159' : '30, 64, 175'}, ${Math.random() * 0.5 + 0.5})`,
-                boxShadow: `0 0 ${Math.random() * 10 + 5}px rgba(${Math.random() > 0.5 ? '86, 30, 159' : '30, 64, 175'}, 0.8)`,
-              }}
-            />
-          ))}
-        </div>
       </body>
     </html>
   )

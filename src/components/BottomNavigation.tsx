@@ -59,23 +59,19 @@ export default function BottomNavigation({ currentPath }: { currentPath: string 
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 glass-effect border-t border-purple-900/20 backdrop-blur-lg z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50">
       <div className="flex justify-around max-w-md mx-auto">
         {navItems.map((item) => (
           <Link 
             key={item.path} 
             href={item.path}
-            className={`flex flex-col items-center py-3 px-2 transition-all duration-300 ${
+            className={`nav-item ${
               currentPath === item.path
-                ? 'text-white glow scale-110'
-                : 'text-gray-300 hover:text-white/90'
+                ? 'nav-item-active'
+                : 'nav-item-inactive'
             }`}
           >
-            <div className={`${
-              currentPath === item.path 
-                ? 'text-white' 
-                : 'text-gray-300'
-            }`}>
+            <div>
               {item.icon}
             </div>
             <span className="text-xs mt-1 font-medium">{item.name}</span>
