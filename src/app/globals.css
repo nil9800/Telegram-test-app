@@ -36,25 +36,28 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 10, 10, 18;
   --background-end-rgb: 20, 20, 30;
-  --accent-color-1: 59, 130, 246;
-  --accent-color-2: 37, 99, 235;
+  --accent-color-1: 99, 102, 241;
+  --accent-color-2: 79, 70, 229;
+  --card-bg: 30, 41, 59;
+  --card-border: 51, 65, 85;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: #121212;
+  background: #0f172a;
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
 }
 
 .glass-effect {
-  background: rgba(30, 30, 40, 0.7);
+  background: rgba(30, 41, 59, 0.8);
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(70, 70, 90, 0.2);
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(51, 65, 85, 0.3);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
 .card {
-  @apply rounded-xl glass-effect p-4;
+  @apply rounded-2xl glass-effect p-5;
 }
 
 .glow {
@@ -67,25 +70,25 @@ body {
 }
 
 .nav-item-active {
-  @apply text-blue-400;
+  @apply text-indigo-500;
 }
 
 .nav-item-inactive {
-  @apply text-gray-400 hover:text-gray-300;
+  @apply text-slate-400 hover:text-slate-300;
 }
 
 /* Button styles */
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium text-center transition-colors;
+  @apply bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-xl font-medium text-center transition-colors;
 }
 
 .btn-secondary {
-  @apply bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-lg font-medium text-center transition-colors;
+  @apply bg-slate-700 hover:bg-slate-600 text-white py-2 px-3 rounded-xl font-medium text-center transition-colors;
 }
 
 /* Common utility classes */
 .dark-card {
-  @apply bg-gray-800 rounded-xl p-4 border border-gray-700;
+  @apply bg-slate-800 rounded-2xl p-5 border border-slate-700 shadow-lg;
 }
 
 .text-primary {
@@ -93,11 +96,45 @@ body {
 }
 
 .text-secondary {
-  @apply text-gray-300;
+  @apply text-slate-300;
 }
 
 .text-muted {
-  @apply text-gray-400;
+  @apply text-slate-400;
+}
+
+/* Resource cards */
+.resource-card {
+  @apply bg-slate-700 p-4 rounded-xl border border-slate-600 shadow-md;
+}
+
+.resource-energy {
+  @apply bg-gradient-to-br from-blue-900/50 to-blue-800/30 border-blue-700/50;
+}
+
+.resource-gold {
+  @apply bg-gradient-to-br from-amber-900/50 to-amber-800/30 border-amber-700/50;
+}
+
+.resource-special {
+  @apply bg-gradient-to-br from-purple-900/50 to-purple-800/30 border-purple-700/50;
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply w-full bg-slate-700 rounded-full h-2.5 overflow-hidden;
+}
+
+.progress-bar-fill {
+  @apply h-full rounded-full transition-all duration-500;
+}
+
+.progress-bar-energy {
+  @apply bg-gradient-to-r from-blue-600 to-blue-400;
+}
+
+.progress-bar-level {
+  @apply bg-gradient-to-r from-indigo-600 to-violet-500;
 }
 
 @media (prefers-color-scheme: dark) {

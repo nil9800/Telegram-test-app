@@ -33,6 +33,7 @@ export default function ProfilePage() {
   const [level, setLevel] = useState(5);
   const [experience, setExperience] = useState(450);
   const [nextLevelExperience, setNextLevelExperience] = useState(1000);
+  const [activeTab, setActiveTab] = useState('achievements');
   
   const [achievements, setAchievements] = useState<Achievement[]>([
     {
@@ -106,8 +107,6 @@ export default function ProfilePage() {
     }
   ]);
   
-  const [showSettings, setShowSettings] = useState(false);
-  
   useEffect(() => {
     const telegramUser = getTelegramUser();
     if (telegramUser) {
@@ -154,6 +153,13 @@ export default function ProfilePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
+      case 'settings':
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        );
       default:
         return (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,119 +174,113 @@ export default function ProfilePage() {
 
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center p-6 bg-gradient-to-b from-[#2AABEE] to-[#229ED9] pb-16">
+      <main className="flex min-h-screen flex-col items-center p-4">
         <div className="w-full max-w-md">
           {/* Profile Header */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="dark-card mb-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-2xl font-bold mr-4">
+                <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center text-white text-2xl font-bold mr-4">
                   {user.first_name ? user.first_name.charAt(0) : 'U'}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800">
+                  <h2 className="text-xl font-bold text-white">
                     {user.first_name} {user.last_name || ''}
                   </h2>
-                  <p className="text-gray-500">@{user.username || 'user'}</p>
+                  <p className="text-slate-400">@{user.username || 'user'}</p>
                 </div>
               </div>
-              <button 
-                onClick={() => setShowSettings(!showSettings)}
-                className="p-2 bg-gray-100 rounded-full text-gray-500"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+              <button className="p-2 bg-slate-700 rounded-lg text-slate-400 hover:bg-slate-600 transition-colors">
+                {renderIcon('settings')}
               </button>
             </div>
             
             {/* Level Progress */}
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">Level {level}</span>
-                <span className="text-sm text-gray-500">{experience}/{nextLevelExperience} XP</span>
+            <div className="mb-2">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-white">Level {level}</span>
+                <span className="text-sm text-slate-400">{experience}/{nextLevelExperience} XP</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div className="progress-bar">
                 <div 
-                  className="bg-blue-600 h-2.5 rounded-full" 
+                  className="progress-bar-fill progress-bar-level" 
                   style={{ width: `${(experience / nextLevelExperience) * 100}%` }}
                 ></div>
               </div>
             </div>
-            
-            {/* Settings Panel (conditionally rendered) */}
-            {showSettings && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium text-gray-800 mb-3">Settings</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Notifications</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Sound Effects</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Dark Mode</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                  <button className="w-full py-2 bg-red-500 text-white rounded-lg mt-3">
-                    Log Out
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
           
-          {/* Achievements */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Achievements</h2>
-            
+          {/* Tabs */}
+          <div className="flex mb-6 bg-slate-800/50 rounded-xl p-1">
+            <button 
+              onClick={() => setActiveTab('achievements')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'achievements' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Achievements
+            </button>
+            <button 
+              onClick={() => setActiveTab('stats')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'stats' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Statistics
+            </button>
+            <button 
+              onClick={() => setActiveTab('settings')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'settings' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Settings
+            </button>
+          </div>
+          
+          {/* Achievements Tab */}
+          {activeTab === 'achievements' && (
             <div className="space-y-4">
               {achievements.map((achievement) => (
                 <div 
                   key={achievement.id} 
-                  className={`p-4 rounded-lg border ${
-                    achievement.unlocked ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'
+                  className={`dark-card ${
+                    achievement.unlocked ? 'border-green-500/30 bg-green-500/5' : ''
                   }`}
                 >
                   <div className="flex items-start">
                     <div className={`p-2 rounded-lg mr-3 ${
-                      achievement.unlocked ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                      achievement.unlocked ? 'bg-green-500/20 text-green-400' : 'bg-indigo-500/20 text-indigo-400'
                     }`}>
                       {renderIcon(achievement.icon)}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
-                        <h3 className="font-medium text-gray-800">{achievement.name}</h3>
+                        <h3 className="font-medium text-white">{achievement.name}</h3>
                         {achievement.unlocked && (
-                          <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
+                          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                            Unlocked
+                          </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 mb-2">{achievement.description}</p>
-                      {!achievement.unlocked && achievement.progress !== undefined && achievement.total !== undefined && (
+                      <p className="text-xs text-slate-400 mb-2">{achievement.description}</p>
+                      
+                      {!achievement.unlocked && achievement.progress !== undefined && (
                         <>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="progress-bar">
                             <div 
-                              className="h-2 rounded-full bg-blue-500"
-                              style={{ width: `${(achievement.progress / achievement.total) * 100}%` }}
+                              className="progress-bar-fill bg-indigo-500" 
+                              style={{ width: `${(achievement.progress / achievement.total!) * 100}%` }}
                             ></div>
                           </div>
-                          <div className="flex justify-between mt-1">
-                            <span className="text-xs text-gray-500">
+                          <div className="flex justify-end mt-1">
+                            <span className="text-xs text-slate-400">
                               {achievement.progress}/{achievement.total}
                             </span>
                           </div>
@@ -291,28 +291,65 @@ export default function ProfilePage() {
                 </div>
               ))}
             </div>
-          </div>
+          )}
           
-          {/* Statistics */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Your Stats</h2>
-            
-            <div className="grid grid-cols-2 gap-4">
-              {statistics.map((stat, index) => (
-                <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    <div className="p-2 bg-blue-100 rounded-lg text-blue-600 mr-3">
-                      {renderIcon(stat.icon)}
+          {/* Statistics Tab */}
+          {activeTab === 'stats' && (
+            <div className="dark-card">
+              <h2 className="text-lg font-bold text-white mb-4">Your Statistics</h2>
+              
+              <div className="space-y-4">
+                {statistics.map((stat, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-slate-700 rounded-xl border border-slate-600">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 mr-3">
+                        {renderIcon(stat.icon)}
+                      </div>
+                      <span className="text-white">{stat.name}</span>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-500">{stat.name}</p>
-                      <p className="text-lg font-bold">{stat.value}</p>
-                    </div>
+                    <span className="font-bold text-indigo-400">{stat.value}</span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div className="dark-card">
+              <h2 className="text-lg font-bold text-white mb-4">Settings</h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-slate-700 rounded-xl border border-slate-600">
+                  <span className="text-white">Notifications</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-400 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-700 rounded-xl border border-slate-600">
+                  <span className="text-white">Sound Effects</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-400 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-700 rounded-xl border border-slate-600">
+                  <span className="text-white">Dark Mode</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-400 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
+                
+                <button className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors mt-2">
+                  Log Out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
       <BottomNavigation currentPath="/profile" />

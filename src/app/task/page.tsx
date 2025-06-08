@@ -29,6 +29,7 @@ interface Task {
 
 export default function TaskPage() {
   const [user, setUser] = useState<TelegramUser | null>(null);
+  const [activeTab, setActiveTab] = useState('daily');
   const [dailyTasks, setDailyTasks] = useState<Task[]>([
     {
       id: 'daily-login',
@@ -154,7 +155,7 @@ export default function TaskPage() {
     switch (type) {
       case 'gold':
         return (
-          <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
           </svg>
         );
@@ -200,54 +201,86 @@ export default function TaskPage() {
     <>
       <main className="flex min-h-screen flex-col items-center p-4">
         <div className="w-full max-w-md">
-          {/* Daily Tasks */}
-          <div className="dark-card mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-primary">Daily Tasks</h2>
-              <div className="text-sm bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full border border-blue-800">
-                {dailyTasks.filter(task => task.completed).length}/{dailyTasks.length}
-              </div>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-white">Tasks</h1>
+            <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-white">
+              {user.first_name ? user.first_name.charAt(0) : 'U'}
             </div>
-            
+          </div>
+          
+          {/* Tabs */}
+          <div className="flex mb-6 bg-slate-800/50 rounded-xl p-1">
+            <button 
+              onClick={() => setActiveTab('daily')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'daily' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Daily Tasks
+            </button>
+            <button 
+              onClick={() => setActiveTab('weekly')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'weekly' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Weekly Tasks
+            </button>
+          </div>
+          
+          {/* Daily Tasks Tab */}
+          {activeTab === 'daily' && (
             <div className="space-y-4">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-lg font-bold text-white">Daily Tasks</h2>
+                <div className="text-sm bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full">
+                  {dailyTasks.filter(task => task.completed).length}/{dailyTasks.length}
+                </div>
+              </div>
+              
               {dailyTasks.map((task) => (
                 <div 
                   key={task.id} 
-                  className={`p-4 rounded-lg border ${
-                    task.completed ? 'border-green-700 bg-green-900/20' : 'border-gray-600 bg-gray-700'
+                  className={`dark-card ${
+                    task.completed ? 'border-green-500/30 bg-green-500/5' : ''
                   }`}
                 >
                   <div className="flex items-start">
                     <div className={`p-2 rounded-lg mr-3 ${
-                      task.completed ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-blue-900/50 text-blue-400 border border-blue-700'
+                      task.completed ? 'bg-green-500/20 text-green-400' : 'bg-indigo-500/20 text-indigo-400'
                     }`}>
                       {renderIcon(task.icon)}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
-                        <h3 className="font-medium text-primary">{task.title}</h3>
+                        <h3 className="font-medium text-white">{task.title}</h3>
                         <div className="flex items-center">
                           {renderRewardIcon(task.reward.type)}
-                          <span className="text-sm font-medium ml-1 text-secondary">{task.reward.amount}</span>
+                          <span className="text-sm font-medium ml-1 text-slate-300">{task.reward.amount}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted mb-2">{task.description}</p>
-                      <div className="w-full bg-gray-600 rounded-full h-2">
+                      <p className="text-xs text-slate-400 mb-3">{task.description}</p>
+                      <div className="progress-bar">
                         <div 
-                          className={`h-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-blue-500'}`}
+                          className={`progress-bar-fill ${task.completed ? 'bg-green-500' : 'bg-indigo-500'}`}
                           style={{ width: `${(task.progress / task.total) * 100}%` }}
                         ></div>
                       </div>
-                      <div className="flex justify-between mt-1">
-                        <span className="text-xs text-muted">
+                      <div className="flex justify-between mt-2">
+                        <span className="text-xs text-slate-400">
                           {task.progress}/{task.total}
                         </span>
                         {task.completed && !task.claimed && (
                           <button 
                             onClick={() => handleClaimReward(task.id, true)}
-                            className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors"
+                            className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition-colors"
                           >
-                            Claim
+                            Claim Reward
                           </button>
                         )}
                         {task.completed && task.claimed && (
@@ -259,56 +292,56 @@ export default function TaskPage() {
                 </div>
               ))}
             </div>
-          </div>
+          )}
           
-          {/* Weekly Tasks */}
-          <div className="dark-card mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-primary">Weekly Tasks</h2>
-              <div className="text-sm bg-purple-900/50 text-purple-300 px-3 py-1 rounded-full border border-purple-800">
-                {weeklyTasks.filter(task => task.completed).length}/{weeklyTasks.length}
-              </div>
-            </div>
-            
+          {/* Weekly Tasks Tab */}
+          {activeTab === 'weekly' && (
             <div className="space-y-4">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-lg font-bold text-white">Weekly Tasks</h2>
+                <div className="text-sm bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full">
+                  {weeklyTasks.filter(task => task.completed).length}/{weeklyTasks.length}
+                </div>
+              </div>
+              
               {weeklyTasks.map((task) => (
                 <div 
                   key={task.id} 
-                  className={`p-4 rounded-lg border ${
-                    task.completed ? 'border-green-700 bg-green-900/20' : 'border-gray-600 bg-gray-700'
+                  className={`dark-card ${
+                    task.completed ? 'border-green-500/30 bg-green-500/5' : ''
                   }`}
                 >
                   <div className="flex items-start">
                     <div className={`p-2 rounded-lg mr-3 ${
-                      task.completed ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-purple-900/50 text-purple-400 border border-purple-700'
+                      task.completed ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400'
                     }`}>
                       {renderIcon(task.icon)}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
-                        <h3 className="font-medium text-primary">{task.title}</h3>
+                        <h3 className="font-medium text-white">{task.title}</h3>
                         <div className="flex items-center">
                           {renderRewardIcon(task.reward.type)}
-                          <span className="text-sm font-medium ml-1 text-secondary">{task.reward.amount}</span>
+                          <span className="text-sm font-medium ml-1 text-slate-300">{task.reward.amount}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted mb-2">{task.description}</p>
-                      <div className="w-full bg-gray-600 rounded-full h-2">
+                      <p className="text-xs text-slate-400 mb-3">{task.description}</p>
+                      <div className="progress-bar">
                         <div 
-                          className={`h-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-purple-500'}`}
+                          className={`progress-bar-fill ${task.completed ? 'bg-green-500' : 'bg-purple-500'}`}
                           style={{ width: `${(task.progress / task.total) * 100}%` }}
                         ></div>
                       </div>
-                      <div className="flex justify-between mt-1">
-                        <span className="text-xs text-muted">
+                      <div className="flex justify-between mt-2">
+                        <span className="text-xs text-slate-400">
                           {task.progress}/{task.total}
                         </span>
                         {task.completed && !task.claimed && (
                           <button 
                             onClick={() => handleClaimReward(task.id, false)}
-                            className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors"
+                            className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition-colors"
                           >
-                            Claim
+                            Claim Reward
                           </button>
                         )}
                         {task.completed && task.claimed && (
@@ -319,46 +352,44 @@ export default function TaskPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-          
-          {/* Task Info */}
-          <div className="dark-card mb-6">
-            <h2 className="text-xl font-bold text-primary mb-4">Task Rewards</h2>
-            <p className="text-secondary mb-4">
-              Complete tasks to earn rewards and progress in the game. Daily tasks reset every day at midnight, while weekly tasks reset every Monday.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-700 p-3 rounded-lg border border-gray-600">
-                <div className="flex items-center mb-2">
-                  {renderRewardIcon('energy')}
-                  <h3 className="font-medium text-primary ml-2">Energy</h3>
+              
+              {/* Task Info Card */}
+              <div className="dark-card mt-6">
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 mr-3">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-white">Task Information</h3>
                 </div>
-                <p className="text-xs text-secondary">
-                  Use energy to place blocks and mine resources.
+                <p className="text-slate-300 text-sm">
+                  Complete tasks to earn rewards and progress in the game. Daily tasks reset every day at midnight, while weekly tasks reset every Monday.
                 </p>
-              </div>
-              <div className="bg-gray-700 p-3 rounded-lg border border-gray-600">
-                <div className="flex items-center mb-2">
-                  {renderRewardIcon('gold')}
-                  <h3 className="font-medium text-primary ml-2">Gold</h3>
+                
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="bg-slate-700 p-3 rounded-xl border border-slate-600">
+                    <div className="flex items-center mb-2">
+                      {renderRewardIcon('energy')}
+                      <h3 className="font-medium text-white ml-2">Energy</h3>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Use energy to place blocks and mine resources.
+                    </p>
+                  </div>
+                  <div className="bg-slate-700 p-3 rounded-xl border border-slate-600">
+                    <div className="flex items-center mb-2">
+                      {renderRewardIcon('gold')}
+                      <h3 className="font-medium text-white ml-2">Gold</h3>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Spend gold on upgrades and special items.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-secondary">
-                  Spend gold on upgrades and special items.
-                </p>
-              </div>
-              <div className="bg-gray-700 p-3 rounded-lg col-span-2 border border-gray-600">
-                <div className="flex items-center mb-2">
-                  {renderRewardIcon('special')}
-                  <h3 className="font-medium text-primary ml-2">Special Rewards</h3>
-                </div>
-                <p className="text-xs text-secondary">
-                  Rare rewards that can be used for unique upgrades and bonuses.
-                </p>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
       <BottomNavigation currentPath="/task" />

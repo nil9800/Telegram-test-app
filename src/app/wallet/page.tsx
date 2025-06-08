@@ -72,8 +72,7 @@ export default function WalletPage() {
     }
   ]);
   
-  const [showEnergyOptions, setShowEnergyOptions] = useState(false);
-  const [showGoldOptions, setShowGoldOptions] = useState(false);
+  const [activeTab, setActiveTab] = useState('balances');
   
   useEffect(() => {
     const telegramUser = getTelegramUser();
@@ -87,7 +86,7 @@ export default function WalletPage() {
     switch (currency) {
       case 'gold':
         return (
-          <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
           </svg>
         );
@@ -117,167 +116,221 @@ export default function WalletPage() {
     <>
       <main className="flex min-h-screen flex-col items-center p-4">
         <div className="w-full max-w-md">
-          {/* Wallet Balance */}
-          <div className="dark-card mb-6">
-            <h2 className="text-xl font-bold text-primary mb-4">Your Wallet</h2>
-            
-            <div className="grid grid-cols-3 gap-4">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-white">Wallet</h1>
+            <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-white">
+              {user.first_name ? user.first_name.charAt(0) : 'U'}
+            </div>
+          </div>
+          
+          {/* Tabs */}
+          <div className="flex mb-6 bg-slate-800/50 rounded-xl p-1">
+            <button 
+              onClick={() => setActiveTab('balances')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'balances' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Balances
+            </button>
+            <button 
+              onClick={() => setActiveTab('history')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'history' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              History
+            </button>
+            <button 
+              onClick={() => setActiveTab('convert')} 
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                activeTab === 'convert' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Convert
+            </button>
+          </div>
+          
+          {/* Balances Tab */}
+          {activeTab === 'balances' && (
+            <div className="space-y-5">
               {/* Energy Balance */}
-              <div 
-                className="bg-gray-700 p-4 rounded-lg cursor-pointer border border-gray-600 hover:bg-gray-600 transition-colors"
-                onClick={() => setShowEnergyOptions(!showEnergyOptions)}
-              >
-                <div className="flex items-center justify-center mb-2">
-                  {renderCurrencyIcon('energy')}
+              <div className="dark-card resource-energy">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 mr-3">
+                      {renderCurrencyIcon('energy')}
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-300">Energy Balance</p>
+                      <p className="text-2xl font-bold text-white">{balances.energy}</p>
+                    </div>
+                  </div>
+                  <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-2 px-4 rounded-lg text-sm transition-colors">
+                    Get More
+                  </button>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-400">{balances.energy}</p>
-                  <p className="text-xs text-gray-300">Energy</p>
+                
+                <div className="progress-bar">
+                  <div className="progress-bar-fill progress-bar-energy" style={{ width: `${balances.energy}%` }}></div>
+                </div>
+                <div className="text-xs text-blue-300/70 mt-1 text-right">
+                  75/100
                 </div>
               </div>
               
               {/* Gold Balance */}
-              <div 
-                className="bg-gray-700 p-4 rounded-lg cursor-pointer border border-gray-600 hover:bg-gray-600 transition-colors"
-                onClick={() => setShowGoldOptions(!showGoldOptions)}
-              >
-                <div className="flex items-center justify-center mb-2">
-                  {renderCurrencyIcon('gold')}
+              <div className="dark-card resource-gold">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 mr-3">
+                      {renderCurrencyIcon('gold')}
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-300">Gold Balance</p>
+                      <p className="text-2xl font-bold text-white">{balances.gold}</p>
+                    </div>
+                  </div>
+                  <button className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 py-2 px-4 rounded-lg text-sm transition-colors">
+                    Get More
+                  </button>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-yellow-300">{balances.gold}</p>
-                  <p className="text-xs text-gray-300">Gold</p>
+                
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <button className="py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-xs font-medium transition-colors">
+                    Tasks
+                  </button>
+                  <button className="py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-xs font-medium transition-colors">
+                    Watch Ad
+                  </button>
+                  <button className="py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-xs font-medium transition-colors">
+                    Invite
+                  </button>
                 </div>
               </div>
               
               {/* Special Balance */}
-              <div className="bg-gray-700 p-4 rounded-lg border border-gray-600">
-                <div className="flex items-center justify-center mb-2">
-                  {renderCurrencyIcon('special')}
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-purple-400">{balances.special}</p>
-                  <p className="text-xs text-gray-300">Special</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Energy Options */}
-            {showEnergyOptions && (
-              <div className="mt-4 p-4 bg-gray-700 rounded-lg border border-gray-600">
-                <h3 className="font-medium text-primary mb-3">Get More Energy</h3>
-                <div className="space-y-2">
-                  <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Wait for Refill (8h)
-                  </button>
-                  <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Watch Ad (+10 Energy)
-                  </button>
-                  <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Convert Gold (50 Gold = 20 Energy)
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            {/* Gold Options */}
-            {showGoldOptions && (
-              <div className="mt-4 p-4 bg-gray-700 rounded-lg border border-gray-600">
-                <h3 className="font-medium text-primary mb-3">Get More Gold</h3>
-                <div className="space-y-2">
-                  <button className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                    Complete Tasks
-                  </button>
-                  <button className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Watch Ad (+25 Gold)
-                  </button>
-                  <button className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Invite Friends
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Transaction History */}
-          <div className="dark-card mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-primary">Transaction History</h2>
-              <button className="text-sm text-blue-400 hover:text-blue-300 transition-colors">View All</button>
-            </div>
-            
-            <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg border border-gray-600">
+              <div className="dark-card resource-special">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                      transaction.type === 'earned' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'
-                    }`}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {transaction.type === 'earned' ? (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        ) : (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                        )}
-                      </svg>
+                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mr-3">
+                      {renderCurrencyIcon('special')}
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-primary">{transaction.description}</p>
-                      <p className="text-xs text-muted">{transaction.timestamp}</p>
+                      <p className="text-sm text-slate-300">Special Tokens</p>
+                      <p className="text-2xl font-bold text-white">{balances.special}</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    {renderCurrencyIcon(transaction.currency)}
-                    <span className={`ml-1 font-bold ${
-                      transaction.type === 'earned' ? 'text-green-400' : 'text-red-400'
-                    }`}>
-                      {transaction.type === 'earned' ? '+' : '-'}{transaction.amount}
-                    </span>
-                  </div>
+                  <button className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 py-2 px-4 rounded-lg text-sm transition-colors">
+                    Use
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          )}
           
-          {/* Convert Currency */}
-          <div className="dark-card mb-6">
-            <h2 className="text-xl font-bold text-primary mb-4">Convert Currency</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-700 p-4 rounded-lg border border-gray-600">
-                <h3 className="font-medium text-primary mb-2">Gold to Energy</h3>
-                <p className="text-xs text-secondary mb-3">Convert your gold to energy</p>
-                <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors">
-                  50 Gold → 20 Energy
-                </button>
-              </div>
+          {/* History Tab */}
+          {activeTab === 'history' && (
+            <div className="dark-card">
+              <h2 className="text-lg font-bold text-white mb-4">Transaction History</h2>
               
-              <div className="bg-gray-700 p-4 rounded-lg border border-gray-600">
-                <h3 className="font-medium text-primary mb-2">Special to Gold</h3>
-                <p className="text-xs text-secondary mb-3">Convert special tokens to gold</p>
-                <button className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm transition-colors">
-                  1 Special → 100 Gold
-                </button>
+              <div className="space-y-3">
+                {transactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-700 rounded-xl border border-slate-600">
+                    <div className="flex items-center">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                        transaction.type === 'earned' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'
+                      }`}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          {transaction.type === 'earned' ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          )}
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-white">{transaction.description}</p>
+                        <p className="text-xs text-slate-400">{transaction.timestamp}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      {renderCurrencyIcon(transaction.currency)}
+                      <span className={`ml-1 font-bold ${
+                        transaction.type === 'earned' ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {transaction.type === 'earned' ? '+' : '-'}{transaction.amount}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
+          
+          {/* Convert Tab */}
+          {activeTab === 'convert' && (
+            <div className="dark-card">
+              <h2 className="text-lg font-bold text-white mb-4">Convert Currency</h2>
+              
+              <div className="space-y-4">
+                <div className="bg-slate-700 p-4 rounded-xl border border-slate-600">
+                  <h3 className="font-medium text-white mb-2">Gold to Energy</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 mr-2">
+                        {renderCurrencyIcon('gold')}
+                      </div>
+                      <span className="text-amber-300">50</span>
+                    </div>
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 mr-2">
+                        {renderCurrencyIcon('energy')}
+                      </div>
+                      <span className="text-blue-300">20</span>
+                    </div>
+                  </div>
+                  <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors">
+                    Convert
+                  </button>
+                </div>
+                
+                <div className="bg-slate-700 p-4 rounded-xl border border-slate-600">
+                  <h3 className="font-medium text-white mb-2">Special to Gold</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mr-2">
+                        {renderCurrencyIcon('special')}
+                      </div>
+                      <span className="text-purple-300">1</span>
+                    </div>
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 mr-2">
+                        {renderCurrencyIcon('gold')}
+                      </div>
+                      <span className="text-amber-300">100</span>
+                    </div>
+                  </div>
+                  <button className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm transition-colors">
+                    Convert
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
       <BottomNavigation currentPath="/wallet" />
