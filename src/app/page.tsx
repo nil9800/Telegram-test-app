@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { initTelegramApp, getTelegramUser } from '@/utils/telegram';
 import { useNotification } from '@/utils/NotificationContext';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -91,8 +90,6 @@ export default function Home() {
     setEnergy((prev) => Math.min(prev + 20, 100));
     setGold((prev) => prev + 100);
     setDailyRewardAvailable(false);
-    setDailyRewardClaimed(new Date().toISOString());
-    localStorage.setItem('dailyRewardClaimed', new Date().toISOString());
     showNotification('Daily reward claimed! +20 Energy, +100 Gold', 'success');
   };
   
@@ -198,7 +195,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-bold mb-1">Daily Reward Available!</h2>
-                    <p className="text-gray-400 text-sm">Claim your 100 gold bonus</p>
+                    <p className="text-gray-400 text-sm">Claim your daily bonus</p>
                   </div>
                   <button 
                     onClick={claimDailyReward}
@@ -209,44 +206,11 @@ export default function Home() {
                 </div>
               </div>
             )}
-            
-            {/* Quick Actions */}
-            <div className="card glass-card mb-6">
-              <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <Link 
-                  href="/task" 
-                  className="bg-slate-800/50 text-white p-4 rounded-xl flex flex-col items-center border border-slate-700/50 hover:bg-slate-700/50 transition-colors"
-                >
-                  <Image 
-                    src="/icons/checklist_icon.svg" 
-                    alt="Tasks" 
-                    width={24} 
-                    height={24} 
-                    className="mb-2" 
-                  />
-                  <span>Daily Tasks</span>
-                </Link>
-                <Link 
-                  href="/friends" 
-                  className="bg-slate-800/50 text-white p-4 rounded-xl flex flex-col items-center border border-slate-700/50 hover:bg-slate-700/50 transition-colors"
-                >
-                  <Image 
-                    src="/icons/friends_icon.svg" 
-                    alt="Friends" 
-                    width={24} 
-                    height={24} 
-                    className="mb-2" 
-                  />
-                  <span>Invite Frens</span>
-                </Link>
-              </div>
-            </div>
           </div>
         </>
       )}
-
+      
+      {/* Bottom Navigation */}
       <BottomNavigation currentPath={pathname} />
     </main>
   );
