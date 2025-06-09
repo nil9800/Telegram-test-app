@@ -17,7 +17,26 @@ export default function BottomNavigation({ currentPath }: { currentPath: string 
       path: '/',
       iconSrc: '/icons/home_icon.svg',
     },
-    // Removed other navigation items as they're not part of the core Figma implementation
+    {
+      name: 'Task',
+      path: '/task',
+      iconSrc: '/icons/checklist_icon.svg',
+    },
+    {
+      name: 'Frens',
+      path: '/frens',
+      iconSrc: '/icons/friends_icon.svg',
+    },
+    {
+      name: 'Wallet',
+      path: '/wallet',
+      iconSrc: '/icons/wallet_icon.svg',
+    },
+    {
+      name: 'Profile',
+      path: '/profile',
+      iconSrc: '/icons/profile_icon.svg',
+    },
   ];
 
   return (
