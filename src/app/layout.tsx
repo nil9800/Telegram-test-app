@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
+import { NotificationProvider } from '@/utils/NotificationContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -24,9 +25,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} min-h-screen`}>
-        <div className="pb-16 max-w-md mx-auto relative z-10">
-          {children}
-        </div>
+        <NotificationProvider>
+          <div className="pb-16 max-w-md mx-auto relative z-10">
+            {children}
+          </div>
+        </NotificationProvider>
       </body>
     </html>
   )

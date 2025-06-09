@@ -13,16 +13,16 @@ interface BlockPiece {
 
 interface BlockGameProps {
   level: number;
-  onComplete: () => void;
-  onEnergyUse: (amount: number) => void;
-  availableEnergy: number;
+  onComplete: (success: boolean, goldEarned?: number) => void;
+  onEnergyUse?: (amount: number) => void;
+  availableEnergy?: number;
 }
 
 const BlockGame: React.FC<BlockGameProps> = ({ 
   level, 
   onComplete, 
-  onEnergyUse,
-  availableEnergy 
+  onEnergyUse = () => {},
+  availableEnergy = 100 
 }) => {
   const [pieces, setPieces] = useState<BlockPiece[]>([]);
   const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
@@ -73,9 +73,9 @@ const BlockGame: React.FC<BlockGameProps> = ({
       setShowConfetti(true);
       setMessage('Level Complete! +50 Gold');
       
-      // Notify parent component
+      // Notify parent component with success and gold earned
       setTimeout(() => {
-        onComplete();
+        onComplete(true, 50);
       }, 2000);
     }
   }, [pieces, onComplete]);
@@ -277,4 +277,4 @@ const BlockGame: React.FC<BlockGameProps> = ({
   );
 };
 
-export default BlockGame; 
+export default BlockGame;
