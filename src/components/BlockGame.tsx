@@ -266,7 +266,7 @@ const BlockGame: React.FC<BlockGameProps> = ({
             </div>
             <button 
               className="px-6 py-2 bg-blue-500 text-white rounded-lg font-medium"
-              onClick={onComplete}
+              onClick={() => onComplete(true)}
             >
               Continue
             </button>
