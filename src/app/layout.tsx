@@ -1,14 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import Script from 'next/script'
 import './globals.css'
-import { NotificationProvider } from '@/utils/NotificationContext'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Fun Block Mining',
-  description: 'A Telegram Mini App for Fun Block Mining game',
+  title: 'Lamion - Puzzle Mining Game',
+  description: 'A fun puzzle mining game where you arrange blocks to mine levels',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 }
 
 export default function RootLayout({
@@ -18,18 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <Script
-          src="https://telegram.org/js/telegram-web-app.js"
-          strategy="beforeInteractive"
-        />
-      </head>
-      <body className={`${inter.className} min-h-screen`}>
-        <NotificationProvider>
-          <div className="pb-16 max-w-md mx-auto relative z-10">
-            {children}
-          </div>
-        </NotificationProvider>
+      <body className="min-h-screen bg-gradient-to-b from-[#0f0f23] to-[#1a1a3a]">
+        <div className="min-h-screen flex flex-col">
+          {children}
+        </div>
       </body>
     </html>
   )

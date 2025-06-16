@@ -1,73 +1,37 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { Home, ListTodo, Trophy } from 'lucide-react'
 
-type NavItem = {
-  name: string;
-  path: string;
-  iconSrc: string;
-};
+interface BottomNavigationProps {
+  currentView: 'game' | 'tasks' | 'leaderboard'
+  setCurrentView: (view: 'game' | 'tasks' | 'leaderboard') => void
+}
 
-export default function BottomNavigation({ currentPath }: { currentPath: string }) {
-  const navItems: NavItem[] = [
-    {
-      name: 'Home',
-      path: '/',
-      iconSrc: '/icons/home_icon.svg',
-    },
-    {
-      name: 'Task',
-      path: '/task',
-      iconSrc: '/icons/checklist_icon.svg',
-    },
-    {
-      name: 'Frens',
-      path: '/frens',
-      iconSrc: '/icons/friends_icon.svg',
-    },
-    {
-      name: 'Wallet',
-      path: '/wallet',
-      iconSrc: '/icons/wallet_icon.svg',
-    },
-    {
-      name: 'Profile',
-      path: '/profile',
-      iconSrc: '/icons/profile_icon.svg',
-    },
-  ];
+export function BottomNavigation({ currentView, setCurrentView }: BottomNavigationProps) {
+  const navItems = [
+    { id: 'game', label: 'Game', icon: Home },
+    { id: 'tasks', label: 'Tasks', icon: ListTodo },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy }
+  ] as const
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg border-t border-slate-800 z-50 shadow-lg">
-      <div className="flex justify-around max-w-md mx-auto">
-        {navItems.map((item) => (
-          <Link 
-            key={item.path} 
-            href={item.path}
-            className={`nav-item ${
-              currentPath === item.path
-                ? 'nav-item-active'
-                : 'nav-item-inactive'
+    <nav className="bg-gradient-to-r from-[#1a1a3a] to-[#2d2d5a] border-t border-gray-700 px-4 py-2">
+      <div className="flex justify-around items-center">
+        {navItems.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setCurrentView(id)}
+            className={`flex flex-col items-center py-2 px-4 rounded-lg transition-all duration-200 ${
+              currentView === id
+                ? 'bg-gradient-to-t from-purple-600 to-indigo-600 text-white'
+                : 'text-gray-400 hover:text-white'
             }`}
           >
-            <div className={`p-1.5 ${currentPath === item.path ? 'bg-indigo-500/10 rounded-xl' : ''}`}>
-              <Image 
-                src={item.iconSrc} 
-                alt={item.name} 
-                width={24} 
-                height={24} 
-                className={`${currentPath === item.path ? 'opacity-100' : 'opacity-65'}`}
-              />
-            </div>
-            <span className="text-xs mt-1 font-medium">{item.name}</span>
-            {currentPath === item.path && (
-              <div className="absolute -bottom-0 w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-            )}
-          </Link>
+            <Icon className="w-5 h-5 mb-1" />
+            <span className="text-xs font-medium">{label}</span>
+          </button>
         ))}
       </div>
-    </div>
-  );
+    </nav>
+  )
 }
